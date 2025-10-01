@@ -25,4 +25,9 @@ void USART_IRQHandler(USART_TypeDef * USARTx, uint8_t *buffer, uint32_t * pRx_co
 
 void USART2_Init(int baudrate);
 
+// MP-Sept-25: Added just for testing purposes
+void USART2_WriteString(const char *s);
+void USART2_WriteChar(char c);
+// MP-Sept-25: Moved Printf to UART module
+int printf (const char *format, ...);
 #endif /* __STM32L476G_DISCOVERY_UART_H */

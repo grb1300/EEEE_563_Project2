@@ -14,7 +14,7 @@ Core/Src/demo.o: ../Core/Src/demo.c ../Core/Inc/uart.h ../Core/Inc/main.h \
  ../Core/Inc/stm32l4xx_hal_pwr.h ../Core/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Core/Inc/stm32l4xx_hal_uart.h ../Core/Inc/stm32l4xx_hal_uart_ex.h \
  ../Core/Inc/stm32l476xx.h ../Core/Inc/demo.h ../Core/Inc/gpio.h \
- ../Core/Inc/clock.h ../Core/Inc/LED.h
+ ../Core/Inc/clock.h ../Core/Inc/LED.h ../Core/Inc/timer.h
 ../Core/Inc/uart.h:
 ../Core/Inc/main.h:
 ../Core/Inc/stm32l476xx.h:
@@ -48,3 +48,4 @@ Core/Src/demo.o: ../Core/Src/demo.c ../Core/Inc/uart.h ../Core/Inc/main.h \
 ../Core/Inc/gpio.h:
 ../Core/Inc/clock.h:
 ../Core/Inc/LED.h:
+../Core/Inc/timer.h:

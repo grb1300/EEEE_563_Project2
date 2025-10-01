@@ -5,6 +5,12 @@
  *      Author: larry kiser
  *  Updated on: Sept 9, 2025
  *      Author: Mitesh Parikh
+ *
+ *  Updated on: Sept 23, 2025 (added starter code for Input Capture)
+ *      Author: Mitesh Parikh
+ *
+ *  Updated on: Sept 25, 2025 (fixed issue with PSC and updated code to show Period and Freq)
+ *      Author: Mitesh Parikh
  */
 
 // Standard includes
@@ -13,6 +19,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <float.h>
 
 // Custom Include files
 #include "uart.h"
@@ -21,27 +28,20 @@
 #include "gpio.h"
 #include "clock.h"
 #include "LED.h"
-#include <ctype.h>
+// Added for Project 2
+#include "timer.h"
 
 // Global/Static variables
-static int volatile auto_mode = 1;
 static uint32_t B1_Switch_Press_time_ms = 0;
 static uint32_t one_second_counter = 0;
 static uint8_t one_second_elapsed = 0;
-static uint8_t two_second_elapsed = 0;
-static uint32_t two_second_counter = 0;
-// stuff for PATTERN_MODE
-static uint8_t current_pattern = 0b1100;
-static uint8_t pattern_idx = 0;
 
+// crude delay for demos
+static void delay_ms(uint32_t ms) {
+    // use SysTick if you already set it; this is just a busy-wait fallback
+    for (volatile uint32_t i = 0; i < (ms * 8000UL); ++i) __NOP(); // ~1ms @80MHz (rough)
+}
 
-enum Mode{
-	AUTO_MODE,	//0
-	MANUAL_MODE,
-	PATTERN_MODE
-};
-
-enum Mode OP_MODE = AUTO_MODE;
 // This function is to Initialize SysTick registers
 void init_systick()
 {
@@ -71,7 +71,7 @@ void init_systick()
 void SysTick_Handler(void)
 {
 	//In this example, we will have LED blinking at One second interval so first Update One Second Counter
-	two_second_counter++;
+	//three_second_counter++;
 	one_second_counter++;
 
 	// Set a global One second elapsed flag when the handler has been called 1000 times
@@ -81,43 +81,10 @@ void SysTick_Handler(void)
 		one_second_elapsed = true;
 		one_second_counter = 0;
 	}
-	if (two_second_counter == 2000)
-	{
-		two_second_elapsed = true;
-		two_second_counter = 0;
-	}
 }
 
 
-//******************************************************************************************
-// For USART Print -- Could be moved to UART module
-//******************************************************************************************
-static uint8_t buffer[200];
-static char command_buffer[100];
 
-int printf (const char *format, ...) {
-    va_list aptr;
-    int ret;
-
-    va_start (aptr, format);
-    ret = vsprintf ((char*)buffer, format, aptr);
-    va_end (aptr);
-
-    USART_Write (USART2, buffer, ret);
-
-    return ret;
-}
-
-static int parse_pattern(const char *s, uint8_t *out_bits) {
-    uint8_t b = 0;
-    for (int i = 0; i < 4; i++){
-        char c = s[i];
-        if (c != '0' && c != '1') return 0;
-        b = (uint8_t)((b << 1) | (c - '0'));
-    }
-    *out_bits = b;
-    return 1;
-}
 
 //******************************************************************************************
 // This function is to handle interrupts generated because of pressing B1 switch
@@ -126,12 +93,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-
 		// Now that User pressed B1 switch, check how long switch is in pressed state
-		// if Switch is released within 2 seconds then toggle between Auto and Manual modes
+		// if Switch is released within 3 seconds then toggle between Auto and Manual modes
 		// Add your code ---
 
-		// If more than 2 second then Switch to Pattern Mode
+		// If more than 3 second then Switch to Pattern Mode
 
 		// Reset Switch time (in milliseconds)
 		B1_Switch_Press_time_ms = 0;
@@ -147,29 +113,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			}
 			B1_Switch_Press_time_ms++;
 
-			// If we are in Auto mode and B1 Switch is Pressed for 2 Seconds or more then Switch to Pattern Mode
+			// If we are in Auto mode and B1 Switch is Pressed for 3 Seconds or more then Switch to Pattern Mode
 			// ---- Add your code
 		}
-		if (B1_Switch_Press_time_ms >= 2000){
-			OP_MODE = PATTERN_MODE;
-			printf("%s\r\n", "***PATTERN MODE***");
-			pattern_idx = 0;
-			printf("%s\r\n","Entered Pattern Mode. When ready pleas type Pxxxx (x in {0,1}) or EXIT, then Enter.");
-		}
-		else if(auto_mode && (B1_Switch_Press_time_ms <= 3000)){
-		    		printf("%s\r\n", "SWITCHING TO MANUAL MODE");
-		    		auto_mode = 0;
-		    		OP_MODE = MANUAL_MODE;
-		}
-		else if ((OP_MODE == MANUAL_MODE || OP_MODE == PATTERN_MODE) && (B1_Switch_Press_time_ms <= 3000)){
-		    		printf("%s\r\n", "SWITCHING TO AUTO MODE");
-		    		auto_mode = 1;
-		    		OP_MODE = AUTO_MODE;
-		}
-//		else{
-//			OP_MODE = MANUAL_MODE;
-//			printf("%s\r\n", "***MANUAL MODE***");
-//		}
 	}
 }
 
@@ -179,99 +125,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void run_demo( void )
 {
 	// Default mode is Auto Mode
-	printf("%s\r\n", "STARTING IN AUTO MODE");
+	printf("%s\r\n", "*** AUTO MODE ***");
 
 	// Set buffer for Command Buffer
-	uint32_t input_index = 0;
-	memset(command_buffer, 0, 100);
+	// uint32_t index = 0;
+	//memset(command_buffer, 0, 100);
 
 	// Start forever loop
 	while(1)
 	{
 		// Read USART to see if USER typed any commands
-		char one_char = USART_Read_NB(USART2);
-		if(auto_mode && two_second_elapsed)
-		{
-			if(led_isOn())
-			{
-				led_set(0);
-			}
-			else
-			{
-				led_set(1);
-			}
-			two_second_elapsed = 0;
-		}
-		else if(OP_MODE == PATTERN_MODE){
-			if (one_second_elapsed) { //Execute the current pattern
-		        uint8_t bit = (current_pattern >> (3 - pattern_idx)) & 0x1;
-		        led_set(bit);
-		        pattern_idx = (uint8_t)((pattern_idx + 1) & 0x3);
-		        one_second_elapsed = 0;
-			}
-			if (one_char == 0x0D){
-				printf("%s\r\n", "\0");
-				printf("%s\r", "enter pattern");
-				printf("%s\r\n", "\0");
+		//char one_char = USART_Read_NB(USART2);
+		//(void) one_char;	/// avoid compiler warning
 
-				if (!strcmp("EXIT", command_buffer)) {
-							printf("%s\r\n", "Exiting PATTERN MODE -> AUTO MODE");
-							auto_mode = 1; //was this why we couldnt leave?
-				            OP_MODE = AUTO_MODE;
-				            memset(command_buffer, 0, sizeof(command_buffer));
-				            input_index = 0;
-				            continue; //still stuck in auto mode, force leave?
-				} else if (command_buffer[0] == 'P') {
-					size_t len = strlen(command_buffer);
-					if (len == 5) {
-						uint8_t bits;
-					    if (parse_pattern(&command_buffer[1], &bits)) {
-					    	current_pattern = bits;
-					        pattern_idx = 0;
-					        printf("OK: Pattern set to P%c%c%c%c\r\n",command_buffer[1], command_buffer[2],command_buffer[3], command_buffer[4]);
-					    } else {
-					    	printf("%s\r\n", "Bad Pattern");
-					    }
-					} else {
-						printf("%s\r\n", "Pattern too long or short");
-					}
-				}
-		        memset(command_buffer, 0, 100);
-		        input_index = 0;
-			//} else if(one_char != '\0') {
-			} else if (one_char != '\0' && input_index < sizeof(command_buffer)-1) {
-				command_buffer[input_index++] = one_char;
-				command_buffer[input_index]   = '\0';
-				printf("\r%s", command_buffer);
-			}
-		}
-		else if(!auto_mode)
-		{
-			// toggle User LED based on user input
-			if(one_char == 0x0D) // Enter Key
-			{
-				printf("%s\r\n","\0");
-				if(!strcmp("ON",command_buffer))
-				{
-					led_set(1);
-				}
-				else if(!strcmp("OFF",command_buffer))
-				{
-					led_set(0);
-				}
-				else
-				{
-					printf("Invalid Command: %s\r\n", command_buffer);
-				}
-				memset(command_buffer, 0, 100);
-				input_index = 0;
-			}
-			else if(one_char != '\0')
-			{
-				command_buffer[input_index++] = one_char;
-				printf("\r%s", command_buffer);
-			}
-		}
 		// Switch between Modes
 
 		// If Current mode is Auto Mode then.. Run Auto Mode
@@ -296,5 +162,17 @@ void run_demo( void )
 			//			check whether received command start with "P" -> update current pattern with new Pattern
 			//				Please ensure pattern is valid (4 digits, 0's and 1's)
 			//			In case of bad pattern or invalid command.. inform user accordingly
+
+		// MP-Sept-25: Revised code for Input Capture Info, showing Period and Freq
+		uint32_t ticks = TIM2_GetPeriodTicks(); // copy volatile safely
+		if (ticks > 0)
+		{
+			float freq = 1e6f / ticks;
+			printf("Period = %lu us, Freq = %.2f Hz\r\n", ticks, freq);
+		}
+
+		// MP-Sept-25: delay for demo only -- this is not required for Project as you will not be outputing anything until after
+		// you have histogram is ready to display
+		delay_ms(10);
 	}
 }

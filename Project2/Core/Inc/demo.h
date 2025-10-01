@@ -8,7 +8,7 @@
 #define __DEMO_H
 
 #include "main.h"
-int printf (const char *format, ...) ;
+
 void init_systick( void ) ;
 void run_demo( void ) ;
 

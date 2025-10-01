@@ -1,5 +1,8 @@
-../Core/Src/uart.c:15:6:USART2_Init	0	static
-../Core/Src/uart.c:92:9:USART_Read	0	static
-../Core/Src/uart.c:102:9:USART_Read_NB	0	static
-../Core/Src/uart.c:115:6:USART_Write	0	static
-../Core/Src/uart.c:130:6:USART_IRQHandler	0	static
+../Core/Src/uart.c:100:6:USART2_Init	0	static
+../Core/Src/uart.c:144:9:USART_Read	0	static
+../Core/Src/uart.c:154:9:USART_Read_NB	0	static
+../Core/Src/uart.c:167:6:USART_Write	0	static
+../Core/Src/uart.c:182:6:USART_IRQHandler	0	static
+../Core/Src/uart.c:207:6:USART2_WriteChar	0	static
+../Core/Src/uart.c:213:6:USART2_WriteString	8	static
+C:\ST\STM32CubeIDE_1.19.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/stdio.h:206:5:printf	24	static

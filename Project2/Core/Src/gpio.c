@@ -3,43 +3,51 @@
  *
  *  Created on: Nov 4, 2021
  *      Author: Mitesh Parikh
+ *
+ *  Updated on: Sept 25, 2025
+ *      Author: Parikh
+ *      Cleaned up GPIO, removed HAL definitions
  */
 
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "stm32l4xx_hal_gpio.h"
-#include <stdbool.h>
-
-// Add any external Global Variables that we will need access to
-
-
 
 /*----------------------------------------------------------------------------*/
 /* Configure GPIO                                                             */
 /*----------------------------------------------------------------------------*/
 void GPIO_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+    // 1. Enable GPIO clocks
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;   // for LED (PA5), UART2 (PA2/PA3), TIM2_CH1 (PA0)
+    RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;   // for User Button (PC13)
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+    // ----------------------------
+    // Configure PA5: User LED
+    // ----------------------------
+    GPIOA->MODER &= ~(3u << (5*2));        // clear mode bits
+    GPIOA->MODER |=  (1u << (5*2));        // 01 = output
+    GPIOA->OTYPER &= ~(1u << 5);           // 0 = push-pull
+    GPIOA->OSPEEDR |=  (3u << (5*2));      // very high speed
+    GPIOA->PUPDR &= ~(3u << (5*2));        // no pull
 
-	/*Configure GPIO pin : PtPin */
-	GPIO_InitStruct.Pin = B1_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+    // ----------------------------
+    // Configure PC13: User Button
+    // ----------------------------
+    GPIOC->MODER &= ~(3u << (13*2));       // 00 = input
+    GPIOC->PUPDR &= ~(3u << (13*2));       // no pull (Nucleo board already has ext pull-up)
 
-
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-	/* EXTI15_10_IRQn interrupt init */
-
-	// Note you will have to add EXTI15_10_IRQn Interrupt handler function as well
-	NVIC_EnableIRQ(EXTI15_10_IRQn);
+    // ----------------------------
+    // Configure PA0: TIM2_CH1 input capture
+    // ----------------------------
+    GPIOA->MODER &= ~(3u << (0*2));
+    GPIOA->MODER |=  (2u << (0*2));        					// 10 = alternate function
+    GPIOA->AFR[0] &= ~(0xFu << (0*4));
+    GPIOA->AFR[0] |=  (0x1u << (0*4));     					// AF1 = TIM2_CH1
+    GPIOA->OSPEEDR |=  (3u << (0*2));      					// very high speed
+    GPIOA->PUPDR   &= ~(3u << (0*2));
+    GPIOA->PUPDR   |=  (2u << (0*2));      					// pull-down → avoids floating input when no signal
 }
 
 //******************************************************************************************
@@ -49,3 +57,4 @@ void EXTI15_10_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
 }
+
