@@ -30,11 +30,41 @@
 #include "LED.h"
 // Added for Project 2
 #include "timer.h"
+#include <ctype.h>
 
 // Global/Static variables
 static uint32_t B1_Switch_Press_time_ms = 0;
 static uint32_t one_second_counter = 0;
 static uint8_t one_second_elapsed = 0;
+
+#define PULSES_DEFAULT   1000u
+#define LOWER_DEFAULT    1000u
+#define PULSES_MIN       100u
+#define PULSES_MAX       9999u
+#define LOWER_MIN_US     100u
+#define LOWER_MAX_US     9000u
+
+enum Mode{
+	AUTO_MODE,	//0
+	MANUAL_MODE,
+	PATTERN_MODE
+};
+enum Mode OP_MODE = AUTO_MODE;
+
+enum ui_state_t{
+    UI_INIT, //0
+    UI_PROMPT_PULSES,
+    UI_PROMPT_LOWER,
+    UI_CONFIRM,
+    UI_WAIT_START,
+    UI_DONE
+};
+
+enum ui_state_t ui_state = UI_INIT;
+
+static uint32_t num_pulses   = PULSES_DEFAULT;
+static uint32_t lower_us     = LOWER_DEFAULT;
+static uint32_t upper_us     = LOWER_DEFAULT + 100;
 
 // crude delay for demos
 static void delay_ms(uint32_t ms) {
@@ -84,7 +114,16 @@ void SysTick_Handler(void)
 }
 
 
-
+static int parse_uint(const char *s, uint32_t *out){
+    if (!s || !*s) return 0;
+    uint32_t v = 0;
+    for (const char *p = s; *p; ++p){
+        if (!isdigit((unsigned char)*p)) return 0;
+        v = (uint32_t)(v*10u + (uint32_t)(*p - '0'));
+    }
+    *out = v;
+    return 1;
+}
 
 //******************************************************************************************
 // This function is to handle interrupts generated because of pressing B1 switch
@@ -119,49 +158,148 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 
+static char command_buffer[100];
+
 //******************************************************************************************
 // Run Demo -- main function with forever loop
 //******************************************************************************************
+
 void run_demo( void )
 {
 	// Default mode is Auto Mode
 	printf("%s\r\n", "*** AUTO MODE ***");
 
 	// Set buffer for Command Buffer
-	// uint32_t index = 0;
-	//memset(command_buffer, 0, 100);
+	uint32_t input_index = 0;
+	memset(command_buffer, 0, 100);
 
 	// Start forever loop
 	while(1)
 	{
 		// Read USART to see if USER typed any commands
-		//char one_char = USART_Read_NB(USART2);
-		//(void) one_char;	/// avoid compiler warning
+		char one_char = USART_Read_NB(USART2);
+		(void) one_char;	/// avoid compiler warning
 
+		if(OP_MODE == AUTO_MODE){
+		    switch (ui_state){
+		    	case UI_INIT:
+					printf("%s\r\n", "\0");
+					printf("%s\r\n", "*** Default Number of Pulses to read ***");
+					printf("  Number of pulses : %lu\r\n", (unsigned long)num_pulses);
+					printf("%s\r\n", "*** Default Lower Limit of the pulse ***");
+					printf("  Lower limit (us) : %lu\r\n", (unsigned long)lower_us);
+					printf("%s\r\n", "*** Default Upper Limit of the pulse ***");
+					printf("  Upper limit (us) : %lu\r\n", (unsigned long)upper_us);
+					printf("%s\r\n", "\0");
+					memset(command_buffer, 0, 100);
+					input_index = 0;
+					ui_state = UI_PROMPT_PULSES;
+
+					printf("%s\r\n", "\0");
+					printf("%s\r\n", "Entering UI_PROMPT_PULSES");
+					printf("%s\r\n", "*** TYPE Number of pulses then press enter, or enter for default***");
+					printf("%s\r\n", "\0");
+					break;
+		    	case UI_PROMPT_PULSES:
+					if (one_char == 0x0D){
+						if (input_index == 0){
+							num_pulses = PULSES_DEFAULT;
+						}
+						else {
+							uint32_t v;
+							parse_uint(command_buffer, &v);
+							if (v >= PULSES_MIN && v <= PULSES_MAX && v != 0){
+								//valid
+								num_pulses = v;
+							}
+							else {
+								//invalid
+								printf("%s\r\n", "\0");
+								printf("%s\r\n", "*** invalid pulse chosen***");
+								printf("*** Limit of the pulse count [%u..%u] (default %u) ***\r\n", PULSES_MIN, PULSES_MAX, PULSES_DEFAULT);
+								printf("%s\r\n", "*** TYPE Number of pulses then press enter, or enter for default***");
+								printf("%s\r\n", "\0");
+							    memset(command_buffer, 0, 100);
+							    input_index = 0;
+							    break;
+							}
+						}
+						printf("%s\r\n", "\0");
+						printf("  Number of pulses chosen : %lu\r\n", (unsigned long)num_pulses);
+						printf("%s\r\n", "\0");
+						memset(command_buffer, 0, 100);
+						input_index = 0;
+						ui_state = UI_PROMPT_LOWER;
+						printf("%s\r\n", "\0");
+						printf("%s\r\n", "Entering UI_PROMPT_LOWER");
+						printf("%s\r\n", "*** TYPE lower bound of pulses then press enter, or enter for default***");
+						printf("%s\r\n", "\0");
+				} else if (one_char != '\0' && input_index < sizeof(command_buffer)-1) {
+					command_buffer[input_index++] = one_char;
+					command_buffer[input_index]   = '\0';
+					printf("\r%s", command_buffer);
+				}
+				break;
+
+		    case UI_PROMPT_LOWER:
+		    	if (one_char == 0x0D){
+		    		if (input_index == 0){
+		    			lower_us = LOWER_DEFAULT;
+		    		}
+		    		else {
+						uint32_t v;
+						parse_uint(command_buffer, &v);
+						if (v >= LOWER_MIN_US && v <= LOWER_MAX_US && v != 0){
+							//valid
+							lower_us = v;
+						}
+						else {
+							printf("%s\r\n", "\0");
+							printf("%s\r\n", "*** invalid pulse lower limit chosen***");
+		                    printf("*** Lower Limit of the pulse in microseconds [%u..%u] (default %u) ***\r\n", LOWER_MIN_US, LOWER_MAX_US, LOWER_DEFAULT);
+							printf("%s\r\n", "*** TYPE lower limit for pulses then press enter, or enter for default***");
+							printf("%s\r\n", "\0");
+							memset(command_buffer, 0, 100);
+							input_index = 0;
+							break;
+						}
+		    		}
+					printf("%s\r\n", "\0");
+					printf("Minimum pulse chosen : %lu\r\n", (unsigned long)lower_us);
+					upper_us = lower_us + 100;
+					printf("Maximum pulse : %lu\r\n", (unsigned long)upper_us);
+					printf("%s\r\n", "\0");
+					memset(command_buffer, 0, 100);
+					input_index = 0;
+					ui_state = UI_CONFIRM;
+					printf("%s\r\n", "\0");
+					printf("%s\r\n", "Entering UI_CONFIRM");
+					printf("%s\r\n", "*** REVIEW SETTINGS ***");
+					printf("%s\r\n", "\0");
+
+		    	} else if (one_char != '\0' && input_index < sizeof(command_buffer)-1) {
+					command_buffer[input_index++] = one_char;
+					command_buffer[input_index]   = '\0';
+					printf("\r%s", command_buffer);
+				}
+		    	break;
+		    case UI_CONFIRM:
+		    	printf("%s\r\n", "\0");
+		        printf("  Number of pulses : %lu\r\n", (unsigned long)num_pulses);
+		        printf("  Lower limit (us) : %lu\r\n", (unsigned long)lower_us);
+		        printf("  Upper limit (us) : %lu  (lower + 100)\r\n", (unsigned long)upper_us);
+		        printf("\r\nPress Enter to START measurements...\r\n");
+		        printf("%s\r\n", "Entering UI_WAIT_START");
+		        printf("%s\r\n", "\0");
+		        ui_state = UI_WAIT_START;
+		    	break;
+		    case UI_WAIT_START:
+		    	break;
+		    case UI_DONE:
+		    	break;
+		    }
+		}
 		// Switch between Modes
-
-		// If Current mode is Auto Mode then.. Run Auto Mode
-			// While in Auto Mode..
-			//		look for One second timer flag and toggle LED if flag is set
-			//		Reset flag
-			//
-		// If Current mode is Manual Mode then.. Run Manual Mode
-			// While in Manual Mode ..
-			//		If received character from USART is not an Enter Key
-			//			then keep adding character in the command array
-			//		If received character from USART is an Enter key
-			//			Check whether received command is "ON" -> Turn on LED
-			//			Check whether received command is "OFF" -> Turn off LED
-			//			If Command is neither "ON" or "OFF" then it is Invalid command
-			//	In all cases update user by showing received command and whether command is valid or not
-		// If Current mode is Pattern Mode then.. Run Pattern Mode
-			// While in Pattern Mode:
-			//		Use one second timer flag and current Pattern to toggle LED accordingly
-			//		If received character is an ENTER key then
-			//			check whether received command is "EXIT" -> Switch to Auto Mode
-			//			check whether received command start with "P" -> update current pattern with new Pattern
-			//				Please ensure pattern is valid (4 digits, 0's and 1's)
-			//			In case of bad pattern or invalid command.. inform user accordingly
 
 		// MP-Sept-25: Revised code for Input Capture Info, showing Period and Freq
 		uint32_t ticks = TIM2_GetPeriodTicks(); // copy volatile safely

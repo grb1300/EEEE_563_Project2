@@ -1,5 +1,6 @@
-../Core/Src/demo.c:40:13:delay_ms	24	static,ignoring_inline_asm
-../Core/Src/demo.c:46:6:init_systick	4	static
-../Core/Src/demo.c:71:6:SysTick_Handler	4	static
-../Core/Src/demo.c:92:6:HAL_GPIO_EXTI_Callback	16	static
-../Core/Src/demo.c:125:6:run_demo	16	static
+../Core/Src/demo.c:70:13:delay_ms	24	static,ignoring_inline_asm
+../Core/Src/demo.c:76:6:init_systick	4	static
+../Core/Src/demo.c:101:6:SysTick_Handler	4	static
+../Core/Src/demo.c:117:12:parse_uint	24	static
+../Core/Src/demo.c:131:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/demo.c:167:6:run_demo	32	static
