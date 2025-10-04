@@ -1,6 +1,6 @@
-../Core/Src/demo.c:70:13:delay_ms	2
-../Core/Src/demo.c:76:6:init_systick	1
-../Core/Src/demo.c:101:6:SysTick_Handler	2
-../Core/Src/demo.c:117:12:parse_uint	5
-../Core/Src/demo.c:131:6:HAL_GPIO_EXTI_Callback	4
-../Core/Src/demo.c:167:6:run_demo	21
+../Core/Src/demo.c:71:13:delay_ms	2
+../Core/Src/demo.c:77:6:init_systick	1
+../Core/Src/demo.c:102:6:SysTick_Handler	2
+../Core/Src/demo.c:118:12:parse_uint	5
+../Core/Src/demo.c:132:6:HAL_GPIO_EXTI_Callback	4
+../Core/Src/demo.c:168:6:run_demo	28

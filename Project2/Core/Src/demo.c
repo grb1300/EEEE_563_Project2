@@ -43,6 +43,7 @@ static uint8_t one_second_elapsed = 0;
 #define PULSES_MAX       9999u
 #define LOWER_MIN_US     100u
 #define LOWER_MAX_US     9000u
+#define BUCKET_SPAN 	 101u
 
 enum Mode{
 	AUTO_MODE,	//0
@@ -57,11 +58,16 @@ enum ui_state_t{
     UI_PROMPT_LOWER,
     UI_CONFIRM,
     UI_WAIT_START,
+	UI_WAIT_SELECTION,
     UI_DONE
 };
 
 enum ui_state_t ui_state = UI_INIT;
 
+static uint32_t buckets[BUCKET_SPAN];
+static uint32_t pulses_captured = 0;
+static uint8_t  measurement_active = 0;
+static uint32_t last_seen_ticks = 0;
 static uint32_t num_pulses   = PULSES_DEFAULT;
 static uint32_t lower_us     = LOWER_DEFAULT;
 static uint32_t upper_us     = LOWER_DEFAULT + 100;
@@ -70,6 +76,12 @@ static uint32_t upper_us     = LOWER_DEFAULT + 100;
 static void delay_ms(uint32_t ms) {
     // use SysTick if you already set it; this is just a busy-wait fallback
     for (volatile uint32_t i = 0; i < (ms * 8000UL); ++i) __NOP(); // ~1ms @80MHz (rough)
+}
+
+static inline void reset_histogram(void){
+    memset(buckets, 0, sizeof(buckets));
+    pulses_captured = 0;
+    last_seen_ticks = 0;
 }
 
 // This function is to Initialize SysTick registers
@@ -287,15 +299,74 @@ void run_demo( void )
 		    	printf("%s\r\n", "\0");
 		        printf("  Number of pulses : %lu\r\n", (unsigned long)num_pulses);
 		        printf("  Lower limit (us) : %lu\r\n", (unsigned long)lower_us);
+		        upper_us = lower_us + 100u;
 		        printf("  Upper limit (us) : %lu  (lower + 100)\r\n", (unsigned long)upper_us);
 		        printf("\r\nPress Enter to START measurements...\r\n");
-		        printf("%s\r\n", "Entering UI_WAIT_START");
+		        printf("%s\r\n", "Entering UI_WAIT_SELECTION");
+		        printf("%s\r\n", "Press ENTER to confirm, L to return to lower bound, and P to edit pulses.");
 		        printf("%s\r\n", "\0");
-		        ui_state = UI_WAIT_START;
+		        ui_state = UI_WAIT_SELECTION;
+		    	break;
+		    case UI_WAIT_SELECTION:
+		    	if (one_char == '\0'){
+		    		break;
+		    	}
+		    	if (one_char == 0x0D){
+		    		printf("\r\nSTARTING...\r\n");
+		    		printf("%s\r\n", "Entering UI_DONE");
+		    		histogram_reset();
+		    		measurement_active = 1;
+		    		ui_state = UI_DONE;
+		    		break;
+		    	}
+
+		    	else if (one_char == 'L' || one_char == 'l') {
+		    		printf("%s\r\n", "Returning to lower limit");
+		            printf("*** enter Lower Limit of the pulse in microseconds [%u..%u] (current %lu) ***\r\n", LOWER_MIN_US, LOWER_MAX_US, (unsigned long)lower_us);
+		            ui_state = UI_PROMPT_LOWER;
+		            printf("%s\r\n", "Entering UI_PROMPT_LOWER");
+		            memset(command_buffer, 0, 100);
+		            input_index = 0;
+		            break;
+		    	}
+		    	else if (one_char == 'P' || one_char == 'p') {
+		    		printf("%s\r\n", "Returning to pulse setting");
+		            printf("*** enter number of pulses with the range [%u..%u] (current %lu) ***\r\n", PULSES_MIN, PULSES_MAX, (unsigned long)num_pulses);
+		    		ui_state = UI_PROMPT_PULSES;
+		    		printf("%s\r\n", "Entering UI_PROMPT_PULSES");
+		    		memset(command_buffer, 0, 100);
+		    		input_index = 0;
+		    		break;
+		    	}
+		    	else {
+		    		printf("%s\r\n", "INVALID ENTRY");
+			        printf("%s\r\n", "Press ENTER to confirm, L to return to lower bound, and P to edit pulses.");
+			        printf("%s\r\n", "\0");
+			        memset(command_buffer, 0, 100);
+			        input_index = 0;
+			        printf("%s\r\n", "Entering UI_WAIT_SELECTION");
+			        ui_state = UI_WAIT_SELECTION;
+			        break;
+		    	}
 		    	break;
 		    case UI_WAIT_START:
 		    	break;
 		    case UI_DONE:
+		    	if (measurement_active != 1){
+		    		break;
+		    	}
+		    	uint32_t ticks = TIM2_GetPeriodTicks();
+
+		    	if (ticks > 0 && ticks != last_seen_ticks)
+		    	{
+		    		last_seen_ticks = ticks;
+		    		histogram_record(ticks);
+		    		pulses_captured++;
+		    	}
+		    	if (pulses_captured >= num_pulses) {
+		    		measurement_active = 0;
+		    		//print ordered histogram
+		    	}
 		    	break;
 		    }
 		}

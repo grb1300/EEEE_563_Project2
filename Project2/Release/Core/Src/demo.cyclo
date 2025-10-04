@@ -1,5 +1,5 @@
-../Core/Src/demo.c:117:12:parse_uint.constprop.isra	4
-../Core/Src/demo.c:76:6:init_systick	1
-../Core/Src/demo.c:101:6:SysTick_Handler	1
-../Core/Src/demo.c:131:6:HAL_GPIO_EXTI_Callback	4
-../Core/Src/demo.c:167:6:run_demo	18
+../Core/Src/demo.c:118:12:parse_uint.constprop.isra	4
+../Core/Src/demo.c:77:6:init_systick	1
+../Core/Src/demo.c:102:6:SysTick_Handler	1
+../Core/Src/demo.c:132:6:HAL_GPIO_EXTI_Callback	4
+../Core/Src/demo.c:168:6:run_demo	23
