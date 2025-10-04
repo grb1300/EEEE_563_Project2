@@ -1,5 +1,5 @@
-../Core/Src/demo.c:118:12:parse_uint.constprop.isra	16	static
-../Core/Src/demo.c:77:6:init_systick	0	static
-../Core/Src/demo.c:102:6:SysTick_Handler	0	static
-../Core/Src/demo.c:132:6:HAL_GPIO_EXTI_Callback	16	static
-../Core/Src/demo.c:168:6:run_demo	32	static,ignoring_inline_asm
+../Core/Src/demo.c:143:12:parse_uint.constprop.isra	16	static
+../Core/Src/demo.c:102:6:init_systick	0	static
+../Core/Src/demo.c:127:6:SysTick_Handler	0	static
+../Core/Src/demo.c:157:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/demo.c:193:6:run_demo	40	static,ignoring_inline_asm

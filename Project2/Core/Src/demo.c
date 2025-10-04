@@ -64,6 +64,8 @@ enum ui_state_t{
 
 enum ui_state_t ui_state = UI_INIT;
 
+
+static float freq;
 static uint32_t buckets[BUCKET_SPAN];
 static uint32_t pulses_captured = 0;
 static uint8_t  measurement_active = 0;
@@ -82,6 +84,16 @@ static inline void reset_histogram(void){
     memset(buckets, 0, sizeof(buckets));
     pulses_captured = 0;
     last_seen_ticks = 0;
+}
+
+static void print_histogram(void){
+	printf("%s\r\n", "printing histogram");
+    for (uint32_t i = 0; i < BUCKET_SPAN; ++i){
+        uint32_t c = buckets[i];
+        if (c != 0){
+            printf("%lu %lu\r\n", (unsigned long)(lower_us + i), (unsigned long)c);
+        }
+    }
 }
 
 // This function is to Initialize SysTick registers
@@ -314,9 +326,10 @@ void run_demo( void )
 		    	if (one_char == 0x0D){
 		    		printf("\r\nSTARTING...\r\n");
 		    		printf("%s\r\n", "Entering UI_DONE");
-		    		histogram_reset();
+		    		reset_histogram();
 		    		measurement_active = 1;
 		    		ui_state = UI_DONE;
+		    		printf("\r\nSTARTING...\r\n");
 		    		break;
 		    	}
 
@@ -360,12 +373,18 @@ void run_demo( void )
 		    	if (ticks > 0 && ticks != last_seen_ticks)
 		    	{
 		    		last_seen_ticks = ticks;
-		    		histogram_record(ticks);
+		    	    if (ticks >= lower_us && ticks <= upper_us){
+		    	    	freq = 1e6f / ticks;
+		    	        buckets[ticks - lower_us]++;
+		    	    }
 		    		pulses_captured++;
-		    	}
-		    	if (pulses_captured >= num_pulses) {
-		    		measurement_active = 0;
-		    		//print ordered histogram
+					if (pulses_captured >= num_pulses) {
+						measurement_active = 0;
+						//print ordered histogram
+						print_histogram();
+						printf("%s\r\n", "Press ENTER to  run again, L to return to lower bound, and P to edit pulses.");
+						ui_state = UI_WAIT_SELECTION;
+					}
 		    	}
 		    	break;
 		    }
@@ -373,12 +392,12 @@ void run_demo( void )
 		// Switch between Modes
 
 		// MP-Sept-25: Revised code for Input Capture Info, showing Period and Freq
-		uint32_t ticks = TIM2_GetPeriodTicks(); // copy volatile safely
-		if (ticks > 0)
-		{
-			float freq = 1e6f / ticks;
-			printf("Period = %lu us, Freq = %.2f Hz\r\n", ticks, freq);
-		}
+//		uint32_t ticks = TIM2_GetPeriodTicks(); // copy volatile safely
+//		if (ticks > 0)
+//		{
+//			float freq = 1e6f / ticks;
+//			printf("Period = %lu us, Freq = %.2f Hz\r\n", ticks, freq);
+//		}
 
 		// MP-Sept-25: delay for demo only -- this is not required for Project as you will not be outputing anything until after
 		// you have histogram is ready to display
