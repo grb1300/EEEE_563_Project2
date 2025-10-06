@@ -34,8 +34,10 @@
 
 // Global/Static variables
 static uint32_t B1_Switch_Press_time_ms = 0;
-static uint32_t one_second_counter = 0;
-static uint8_t one_second_elapsed = 0;
+static uint32_t seventyFive_milisecond_counter = 0;
+static uint8_t seventyFive_milisecond_elapsed = 0;
+static uint8_t start_timer = 0;
+
 
 #define PULSES_DEFAULT   1000u
 #define LOWER_DEFAULT    1000u
@@ -46,11 +48,17 @@ static uint8_t one_second_elapsed = 0;
 #define BUCKET_SPAN 	 101u
 
 enum Mode{
-	AUTO_MODE,	//0
-	MANUAL_MODE,
-	PATTERN_MODE
+	POST,	//0
+	POST_CONFIRMED,
 };
-enum Mode OP_MODE = AUTO_MODE;
+
+
+enum Mode OP_MODE = POST;
+
+typedef enum {
+	POST_PASSED,	//0
+	POST_FAILED,
+}Post_Status;
 
 enum ui_state_t{
     UI_INIT, //0
@@ -124,17 +132,17 @@ void init_systick()
 //******************************************************************************************
 void SysTick_Handler(void)
 {
-	//In this example, we will have LED blinking at One second interval so first Update One Second Counter
-	//three_second_counter++;
-	one_second_counter++;
+    if(start_timer == 1){
+    	seventyFive_milisecond_counter++;
 
-	// Set a global One second elapsed flag when the handler has been called 1000 times
-	// Once flag is set, reset the counter
-	if (one_second_counter == 1000)
-	{
-		one_second_elapsed = true;
-		one_second_counter = 0;
-	}
+    	if (seventyFive_milisecond_counter >= 75)
+    	{
+
+    		seventyFive_milisecond_elapsed = 1;
+    		seventyFive_milisecond_counter = 0;
+    		start_timer = 0;
+    	}
+    }
 }
 
 
@@ -149,11 +157,14 @@ static int parse_uint(const char *s, uint32_t *out){
     return 1;
 }
 
+
 //******************************************************************************************
 // This function is to handle interrupts generated because of pressing B1 switch
 //******************************************************************************************
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+
+
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
 		// Now that User pressed B1 switch, check how long switch is in pressed state
@@ -180,6 +191,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			// ---- Add your code
 		}
 	}
+
 }
 
 static char command_buffer[100];
@@ -190,12 +202,14 @@ static char command_buffer[100];
 
 void run_demo( void )
 {
-	// Default mode is Auto Mode
-	printf("%s\r\n", "*** AUTO MODE ***");
 
 	// Set buffer for Command Buffer
 	uint32_t input_index = 0;
 	memset(command_buffer, 0, 100);
+	Post_Status status;
+	printf("%s\r\n"," --- Signal Timer ---");
+	printf("%s\r\n","POST - Press Enter to continue");
+
 
 	// Start forever loop
 	while(1)
@@ -203,8 +217,35 @@ void run_demo( void )
 		// Read USART to see if USER typed any commands
 		char one_char = USART_Read_NB(USART2);
 		(void) one_char;	/// avoid compiler warning
+		if(OP_MODE == POST){
+			if (one_char == 0x0D){
+			start_timer = 1;
+			while(1){
+				if (TIM2_GetPeriodTicks() > 0){
+						status = POST_PASSED;
+				        break;
+				        }
+				else if (seventyFive_milisecond_elapsed == 1){
+						status = POST_FAILED;
+				        break;
+				        }
+			}
+			seventyFive_milisecond_elapsed = 0;
 
-		if(OP_MODE == AUTO_MODE){
+			if(status == POST_PASSED){
+				printf("%s\r\n","-- Success --");
+				OP_MODE = POST_CONFIRMED;
+
+			}
+			else if(status == POST_FAILED){
+				printf("%s\r\n","-- Failed -- ");
+				printf("%s\r\n","POST - Press Enter to continue");
+
+			}
+			}
+
+
+		}else if(OP_MODE == POST_CONFIRMED){
 		    switch (ui_state){
 		    	case UI_INIT:
 					printf("%s\r\n", "\0");
