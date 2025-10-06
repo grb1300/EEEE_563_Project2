@@ -92,6 +92,7 @@ static inline void reset_histogram(void){
     memset(buckets, 0, sizeof(buckets));
     pulses_captured = 0;
     last_seen_ticks = 0;
+
 }
 
 static void print_histogram(void){
@@ -99,7 +100,7 @@ static void print_histogram(void){
     for (uint32_t i = 0; i < BUCKET_SPAN; ++i){
         uint32_t c = buckets[i];
         if (c != 0){
-            printf("%lu %lu\r\n", (unsigned long)(lower_us + i), (unsigned long)c);
+            printf("%5lu  %8lu\r\n", (unsigned long)(lower_us + i), (unsigned long)c);
         }
     }
 }
@@ -232,6 +233,7 @@ void run_demo( void )
 			}
 			seventyFive_milisecond_elapsed = 0;
 
+
 			if(status == POST_PASSED){
 				printf("%s\r\n","-- Success --");
 				OP_MODE = POST_CONFIRMED;
@@ -239,6 +241,7 @@ void run_demo( void )
 			}
 			else if(status == POST_FAILED){
 				printf("%s\r\n","-- Failed -- ");
+				printf("%lu\r\n", TIM2_GetPeriodTicks());
 				printf("%s\r\n","POST - Press Enter to continue");
 
 			}
@@ -365,12 +368,11 @@ void run_demo( void )
 		    		break;
 		    	}
 		    	if (one_char == 0x0D){
-		    		printf("\r\nSTARTING...\r\n");
 		    		printf("%s\r\n", "Entering UI_DONE");
 		    		reset_histogram();
 		    		measurement_active = 1;
 		    		ui_state = UI_DONE;
-		    		printf("\r\nSTARTING...\r\n");
+		    		printf("%s\r\n", "STARTING...\r\n");
 		    		break;
 		    	}
 
