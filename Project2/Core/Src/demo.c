@@ -51,8 +51,6 @@ enum Mode{
 	POST,	//0
 	POST_CONFIRMED,
 };
-
-
 enum Mode OP_MODE = POST;
 
 typedef enum {
@@ -65,7 +63,6 @@ enum ui_state_t{
     UI_PROMPT_PULSES,
     UI_PROMPT_LOWER,
     UI_CONFIRM,
-    UI_WAIT_START,
 	UI_WAIT_SELECTION,
     UI_DONE
 };
@@ -92,7 +89,6 @@ static inline void reset_histogram(void){
     memset(buckets, 0, sizeof(buckets));
     pulses_captured = 0;
     last_seen_ticks = 0;
-
 }
 
 static void print_histogram(void){
@@ -405,8 +401,6 @@ void run_demo( void )
 			        break;
 		    	}
 		    	break;
-		    case UI_WAIT_START:
-		    	break;
 		    case UI_DONE:
 		    	if (measurement_active != 1){
 		    		break;
@@ -433,7 +427,6 @@ void run_demo( void )
 		    }
 		}
 		// Switch between Modes
-
 		// MP-Sept-25: Revised code for Input Capture Info, showing Period and Freq
 //		uint32_t ticks = TIM2_GetPeriodTicks(); // copy volatile safely
 //		if (ticks > 0)
