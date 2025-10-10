@@ -1,0 +1,12 @@
+../Core/Src/main.c:70:6:init_systick	0	static
+../Core/Src/main.c:95:6:SysTick_Handler	0	static
+../Core/Src/main.c:126:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/main.c:205:6:GPIO_Init	0	static
+../Core/Src/main.c:221:6:TIM2_PWM_Init	0	static
+../Core/Src/main.c:243:6:UART_Init	0	static
+../Core/Src/main.c:314:6:UART_ReceiveChar	0	static
+../Core/Src/main.c:321:6:UART_Write	8	static
+../Core/Src/main.c:341:6:UART_SendChar	0	static
+../Core/Src/main.c:353:6:UART_SendString	8	static
+../Core/Src/main.c:159:5:main	48	static
+../Core/Src/main.c:361:6:UART_Delay	0	static

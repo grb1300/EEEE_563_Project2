@@ -1,0 +1,6 @@
+../Core/Inc/core_cm4.h:1679:22:__NVIC_EnableIRQ	2
+../Core/Inc/core_cm4.h:1770:22:__NVIC_ClearPendingIRQ	2
+../Core/Inc/core_cm4.h:1809:22:__NVIC_SetPriority	2
+../Core/Src/timer.c:21:6:TIM2_Init	1
+../Core/Src/timer.c:78:6:TIM2_IRQHandler	3
+../Core/Src/timer.c:114:10:TIM2_GetPeriodTicks	1
