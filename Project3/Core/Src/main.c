@@ -158,13 +158,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 int main(void)
 {
+
+	//Couldnt get UART_SendString() working so swapped back to USART2_WriteString()
     // Initialize GPIO, Timer, and UART
 	System_Clock_Init(); // set System Clock = 80 MHz
 	GPIO_Init();
     TIM2_PWM_Init();
-    init_systick();
-	USART2_Init(115200);
-	USART2_WriteString("Complete Clock, GPIO and UART config!\r\n");
+//    init_systick();
+//	USART2_Init(115200);
+//	USART2_WriteString("Complete Clock, GPIO and UART config!\r\n");
     UART_Init();
 
     char buffer[10];
@@ -173,7 +175,7 @@ int main(void)
     while (1) {
         // Prompt user for new pulse width
 
-    	UART_SendString("Enter new pulse width (in microseconds, 10-200): ");
+    	USART2_WriteString("Enter new pulse width (in microseconds, 10-200): ");
 
         int i = 0;
         char c;
@@ -297,7 +299,9 @@ void UART_Init( void )
 	// If oversampling by 8,  Tx/Rx baud = 2*f_CK / USARTDIV
 	// When OVER8 = 0, BRR = USARTDIV
 	// USARTDIV = 80MHz/9600 = 8333 = 0x208D
-	USART2->BRR  = 0x208D; // Limited to 16 bits
+	//USART2->BRR  = 0x208D; // Limited to 16 bits
+    uint32_t pclk1 = 80000000UL;  // if PLL at 80 MHz, APB1 prescaler = 1
+    USART2->BRR = (pclk1 + (115200/2U)) / 115200;
 
 	USART2->CR1  |= (USART_CR1_RE | USART_CR1_TE);  	// Transmitter and Receiver enable
 

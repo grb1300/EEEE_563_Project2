@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<item key="replaceBarOpen" value="false"/>
+	<list key="searchhistory">
+		<item value="UI_WAIT_START"/>
+		<item value="UI_WAIT_SELECTION"/>
+		<item value="seconds_left"/>
+		<item value="_reset"/>
+		<item value="LOWER_MIN_US"/>
+		<item value="PULSES_MAX"/>
+		<item value="PULSES_MAC"/>
+		<item value="PULSES_MIN"/>
+		<item value="PULSES_DEFAULT"/>
+		<item value="num_pulses"/>
+		<item value="ctype"/>
+		<item value="printf (const "/>
+		<item value="buffer"/>
+		<item value="command_buffer"/>
+		<item value="Project"/>
+	</list>
+</section>

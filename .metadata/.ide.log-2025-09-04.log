@@ -1,0 +1,59 @@
+2025-09-04 10:53:55,512 [INFO] WebApp:194 - Connection lost
+2025-09-04 10:54:09,468 [INFO] WebApp:191 - Connection restablished
+2025-09-04 10:54:10,733 [INFO] WebApp:194 - Connection lost
+2025-09-04 10:54:11,050 [INFO] WebApp:191 - Connection restablished
+2025-09-04 10:55:55,244 [INFO] WebApp:194 - Connection lost
+2025-09-04 10:55:55,400 [INFO] WebApp:191 - Connection restablished
+2025-09-04 17:03:08,196 [INFO] WebApp:194 - Connection lost
+2025-09-04 17:03:09,618 [INFO] WebApp:191 - Connection restablished
+2025-09-04 17:03:12,821 [INFO] WebApp:194 - Connection lost
+2025-09-04 17:03:13,077 [INFO] WebApp:191 - Connection restablished
+2025-09-04 17:06:33,684 [INFO] WebApp:194 - Connection lost
+2025-09-04 17:06:33,823 [INFO] WebApp:191 - Connection restablished
+2025-09-04 17:09:35,725 [INFO] WebApp:194 - Connection lost
+2025-09-04 17:09:35,873 [INFO] WebApp:191 - Connection restablished
+2025-09-04 17:12:37,209 [INFO] WebApp:194 - Connection lost
+2025-09-04 17:12:37,335 [INFO] WebApp:191 - Connection restablished
+2025-09-04 18:07:01,153 [INFO] Gpio:278 - dependency for GPIO [RCC, SYS, USART2]
+2025-09-04 18:07:02,711 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,2,46,310x76,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-09-04 18:07:04,090 [INFO] Gpio:278 - dependency for GPIO [RCC, SYS, USART2]
+2025-09-04 18:07:22,647 [INFO] Gpio:278 - dependency for GPIO [RCC, SYS, USART2]
+2025-09-04 18:08:19,235 [INFO] Gpio:278 - dependency for GPIO [RCC, SYS, USART2]
+2025-09-04 18:09:32,001 [INFO] NvicIntPanel:101 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,516x164,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2025-09-04 18:10:42,050 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 636828128 Bytes (951058432)
+2025-09-04 18:10:55,304 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 667236832 Bytes (951058432)
+2025-09-04 18:11:00,919 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 770519520 Bytes (951058432)
+2025-09-04 18:11:01,626 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: SYS
+2025-09-04 18:11:01,626 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: RCC
+2025-09-04 18:11:01,626 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: NVIC
+2025-09-04 18:11:01,627 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: USART
+2025-09-04 18:11:01,628 [INFO] BlockDiagram:2775 - set Specific Code input for plugin: GPIO
+2025-09-04 18:11:01,629 [INFO] CodeGenerator:892 - code generatio: config db path: C:\ST\STM32CubeIDE_1.19.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.15.0.202507011659\\db\
+2025-09-04 18:11:01,782 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\license.tmp_save
+2025-09-04 18:11:02,168 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\license.tmp
+2025-09-04 18:11:02,238 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\gpio.tmp_save
+2025-09-04 18:11:02,422 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\gpio.tmp
+2025-09-04 18:11:02,692 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\stm32l4xx_it.c_save
+2025-09-04 18:11:03,185 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\stm32l4xx_it.c
+2025-09-04 18:11:03,196 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\stm32l4xx_it.h_save
+2025-09-04 18:11:03,312 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\stm32l4xx_it.h
+2025-09-04 18:11:03,335 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\stm32l4xx_hal_msp.c_save
+2025-09-04 18:11:03,555 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\stm32l4xx_hal_msp.c
+2025-09-04 18:11:03,563 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\system.tmp_save
+2025-09-04 18:11:03,639 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\MXTmpFiles\system.tmp
+2025-09-04 18:11:03,655 [INFO] CodeEngine:321 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\stm32l4xx_hal_conf.h_save
+2025-09-04 18:11:03,732 [INFO] CodeEngine:345 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\stm32l4xx_hal_conf.h
+2025-09-04 18:11:03,777 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\main.h_save
+2025-09-04 18:11:03,913 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Inc\main.h
+2025-09-04 18:11:03,922 [INFO] CodeEngine:265 - oldGeneratedFile, C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\main.c_save
+2025-09-04 18:11:04,055 [INFO] CodeEngine:289 - Generated code: C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\Project_1_inclass_demo_LED\Core\Src\main.c
+2025-09-04 18:11:04,644 [INFO] ProjectBuilder:3606 - Time for Copy HAL[1] : 315mS.
+2025-09-04 18:11:04,651 [INFO] ProjectBuilder:5216 - Project Generator version: 4.7.0-B52
+2025-09-04 18:11:04,770 [INFO] ConfigFileManager:1595 - The Die is : DIE415
+2025-09-04 18:11:06,091 [INFO] ProjectBuilder:5496 - Time for Generating toolchain IDE Files: 1440mS.
+2025-09-04 18:11:06,092 [INFO] ProjectBuilder:3463 - Time for Copy CMSIS : 1mS.
+2025-09-04 18:11:06,097 [INFO] ProjectBuilder:3463 - Time for Copy CMSIS : 0mS.
+2025-09-04 18:25:30,474 [INFO] WebApp:194 - Connection lost
+2025-09-04 18:25:32,303 [INFO] WebApp:191 - Connection restablished
+2025-09-04 18:25:36,156 [INFO] WebApp:194 - Connection lost
+2025-09-04 18:25:36,306 [INFO] WebApp:191 - Connection restablished
