@@ -156,9 +156,27 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 }
 
-int main(void)
-{
+//f = System_Clock / (PSC + 1) => f = 80 MHz / (7999 + 1) = 10kHz so a tick is approx 0.1ms
+//period = (ARR + 1) / f --> (199 + 1) / 10kHz = 20ms or 50Hz
+//High pulse width time = CCR_1 / f --> Pulse_Width * 0.1ms == CCR_1 (0.4ms - 2.0ms) and 4-20
+// 0.4–2.0 ms pulse --> CCR1 ticks correspond to (4..20)
+//Duty cycle = 100 * CCR_1 / (ARR + 1) = 100 * CCR_1 / 200 = CCR_1 / 2
+static inline void Servo_SetPulseUs(uint16_t us) {
+    if (us < 400) us = 400;
+    if (us > 2400) us = 2400;
+    TIM2->CCR1 = us / 100;  // 100 µs per tick at PSC=7999
+    for (volatile uint32_t d=0; d<800000; ++d) __NOP();
+}
 
+// Map position of 0..5 to 0.4..2.0 ms
+// ticks 4..20 --> 17 steps across 5 intervals
+static inline void Servo_SetPosition(uint8_t pos) {
+    if (pos > 5) pos = 5;
+    uint32_t ticks = 4 + (pos * (20 - 4)) / 5;  // 4,7,10,13,16,20
+    TIM2->CCR1 = ticks;
+}
+
+int main(void){
 	//Couldnt get UART_SendString() working so swapped back to USART2_WriteString()
     // Initialize GPIO, Timer, and UART
 	System_Clock_Init(); // set System Clock = 80 MHz
@@ -168,36 +186,39 @@ int main(void)
 //	USART2_Init(115200);
 //	USART2_WriteString("Complete Clock, GPIO and UART config!\r\n");
     UART_Init();
-
-    char buffer[10];
-    int pulse_width = 1000;  // Default 1ms pulse width
+    //char buffer[10];
+    //int pulse_width = 1000;  // Default 1ms pulse width
+    int pulse_us = 1000;
 
     while (1) {
         // Prompt user for new pulse width
-
-    	USART2_WriteString("Enter new pulse width (in microseconds, 10-200): ");
-
-        int i = 0;
+    	printf("%s\r\n", "\0");
+    	USART2_WriteString("Enter new pulse width (600-2400): ");
+    	int i = 0;
         char c;
-
+        char buffer[10];
         // Read input from UART
         while ((c = UART_ReceiveChar()) != '\r') {
-            buffer[i++] = c;
+            //buffer[i++] = c;
+        	if (i < (int)sizeof(buffer) - 1) buffer[i++] = c;
             UART_SendChar(c);  // Echo back the character
         }
         buffer[i] = '\0';  // Null-terminate the string
         UART_SendString("\n\r");
-
         // Convert input to integer
-        pulse_width = atoi(buffer);
-
+        //pulse_width = atoi(buffer);
+        pulse_us = atoi(buffer);
         // Validate pulse width (ensure it's between 10 and 200 microseconds)
-        if (pulse_width < 10 || pulse_width > 200) {
-            UART_SendString("Invalid input! Please enter a value between 400 and 2000.\n\r");
+        if (pulse_us < 500 || pulse_us > 2400){//(pulse_width < 10 || pulse_width > 200) {
+        	printf("%s\r\n", "\0");
+            UART_SendString("Invalid input! Please enter a value between 600 and 2400.\n\r");
         } else {
             // Adjust PWM duty cycle based on the user input
-            TIM2->CCR1 = pulse_width;
+            //TIM2->CCR1 = pulse_width;
+        	Servo_SetPulseUs((uint16_t)pulse_us);
+            printf("%s\r\n", "\0");
             UART_SendString("Pulse width updated!\n\r");
+
         }
 
     }
@@ -228,7 +249,7 @@ void TIM2_PWM_Init(void)
     // Configure the timer for PWM
     TIM2->PSC = 7999;   // Prescaler value for 80 MHz / (7999 + 1) = 10 kHz
     TIM2->ARR = 199;    // Auto-reload value for 10 kHz / (199 + 1) = 50 Hz
-    TIM2->CCR1 = 50;    // Initial duty cycle (adjust as necessary)
+    TIM2->CCR1 = 12;    // Initial duty cycle (adjust as necessary)
 
     // Set PWM mode 1 on TIM2 CH1 (active until match, inactive otherwise)
     TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M); // Clear OC1M bits
