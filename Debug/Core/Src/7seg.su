@@ -1,0 +1,3 @@
+../Core/Src/7seg.c:18:6:initSeg	8	static
+../Core/Src/7seg.c:25:6:displaySegment	16	static
+../Core/Src/7seg.c:45:6:multiplexSegment	24	static,ignoring_inline_asm
