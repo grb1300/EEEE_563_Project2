@@ -236,13 +236,13 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
 /* USER CODE BEGIN 1 */
 
-void HAL_TIM_Period_ElapsedCallback(TIM_HandleTypeDef* htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM15){
-
 		// Update the display
 		displaySegment();
 	}
+
 }
 
 /* USER CODE END 1 */

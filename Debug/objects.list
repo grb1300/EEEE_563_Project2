@@ -1,4 +1,5 @@
 "./Core/Src/7seg.o"
+"./Core/Src/SigGen.o"
 "./Core/Src/adc.o"
 "./Core/Src/dac.o"
 "./Core/Src/dma.o"

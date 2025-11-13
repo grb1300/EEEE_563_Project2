@@ -25,8 +25,11 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "SigGen.h"
 #include "7seg.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -57,6 +60,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
+void uart_print(const char *s);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -108,6 +112,8 @@ int main(void)
   multiplexSegment(1234);
   HAL_TIM_Base_Start_IT(&htim15);
 
+  SigGen_Init();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -119,18 +125,24 @@ int main(void)
 
   /* We should never get here as control is now taken by the scheduler */
 
+
+
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
 
-
-
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+}
+
+
+void uart_print(const char *s)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t *)s, strlen(s), HAL_MAX_DELAY);
 }
 
 /**
