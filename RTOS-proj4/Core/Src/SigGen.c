@@ -280,7 +280,7 @@ bool SigGen_Set(sig_wave_t wave, uint32_t fout_hz)
 bool SigGen_ParseCommand(const char *cmd)
 {
     if (!cmd){
-    	uart_print("Executing on line: 283\n");
+    	//uart_print("Executing on line: 283\n");
     	return false;
     }
 
@@ -289,11 +289,11 @@ bool SigGen_ParseCommand(const char *cmd)
 
 	// parse: <word> <number>  (ignores extra spaces at start)
 	if (sscanf(cmd, " %15s %u", wf, &freq) != 2){
-		uart_print("Executing on line: 292\n");
+		//uart_print("Executing on line: 292\n");
 		return false;
 	}
 	if (freq < SIG_FREQ_MIN_HZ || freq > SIG_FREQ_MAX_HZ){
-		uart_print("Executing on line: 296\n");
+		//uart_print("Executing on line: 296\n");
 		return false;
 	}
 
@@ -307,7 +307,7 @@ bool SigGen_ParseCommand(const char *cmd)
 	else if (wf[0] == '0')            waveform = SIG_WAVE_SINE;     // optional numeric - just for fun :)
 	else if (wf[0] == '1')            waveform = SIG_WAVE_SQUARE;
 	else{
-		uart_print("Executing on line: 310 \n");
+		//uart_print("Executing on line: 310 \n");
 		return false;
 	}
 
@@ -317,7 +317,7 @@ bool SigGen_ParseCommand(const char *cmd)
 	   return true;
 	}
 	else {
-		uart_print("Executing on line: 320\n");
+		//uart_print("Executing on line: 320\n");
 	   return false;
 	}
 }
