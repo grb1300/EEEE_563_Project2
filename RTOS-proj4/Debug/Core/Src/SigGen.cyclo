@@ -1,0 +1,10 @@
+../Core/Src/SigGen.c:57:13:fill_sine	2
+../Core/Src/SigGen.c:79:13:fill_square	3
+../Core/Src/SigGen.c:100:13:apply_waveform	3
+../Core/Src/SigGen.c:127:13:Update_TIM6_fs	4
+../Core/Src/SigGen.c:180:13:apply_frequency	3
+../Core/Src/SigGen.c:203:6:SigGen_Init	1
+../Core/Src/SigGen.c:224:6:SigGen_Start	2
+../Core/Src/SigGen.c:240:6:SigGen_Stop	2
+../Core/Src/SigGen.c:253:6:SigGen_Set	4
+../Core/Src/SigGen.c:280:6:SigGen_ParseCommand	14
