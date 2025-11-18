@@ -83,7 +83,7 @@ static void fill_square(uint16_t *dst, uint32_t n)
 
 	for(uint32_t i =0; i < n; ++i){
 		if(i < n/2){
-			dst[i] = (uint16_t)(4095.0f);
+			dst[i] = (uint16_t)(2000.0f);
 		}else{
 			dst[i] = (uint16_t)(0.0f);
 		}
@@ -279,6 +279,7 @@ bool SigGen_Set(sig_wave_t wave, uint32_t fout_hz)
 // -----------------------------------------------------------------------------------
 bool SigGen_ParseCommand(const char *cmd)
 {
+
     if (!cmd) return false;
 
 	char wf[16] = {0};

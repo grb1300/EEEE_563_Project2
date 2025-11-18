@@ -112,6 +112,8 @@ int main(void)
   multiplexSegment(1234);
   HAL_TIM_Base_Start_IT(&htim15);
 
+  uart_print("Enter in form sine|square <100-9999>: ");
+
   SigGen_Init();
 
   /* USER CODE END 2 */

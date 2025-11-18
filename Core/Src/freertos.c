@@ -29,6 +29,8 @@
 #include "SigGen.h"
 #include "7seg.h"
 
+
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -150,11 +152,14 @@ __weak void CLI_task(void *argument)
 {
   /* USER CODE BEGIN CLI_task */
   /* Infinite loop */
+
+
 	for (;;)
 	{
 	    char rx;
 	    static char cmd[32];        // command line buffer
 	    static uint8_t idx = 0;     // current write index
+
 
 	    // Receive 1 char with small timeout
 	    if (HAL_UART_Receive(&huart2, (uint8_t *)&rx, 1, 10) == HAL_OK)
@@ -175,6 +180,7 @@ __weak void CLI_task(void *argument)
 	                if (SigGen_ParseCommand(cmd))
 	                {
 	                    uart_print("OK\r\n");
+
 	                }
 	                else
 	                {
