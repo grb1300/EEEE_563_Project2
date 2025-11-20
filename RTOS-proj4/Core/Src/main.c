@@ -101,16 +101,20 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
-  MX_ADC1_Init();
+  //MX_ADC1_Init(); //fighting for our PA0 pin
   MX_DAC1_Init();
   MX_TIM2_Init();
   MX_TIM6_Init();
   MX_TIM15_Init();
   /* USER CODE BEGIN 2 */
-
   initSeg();
   multiplexSegment(1234);
   HAL_TIM_Base_Start_IT(&htim15);
+
+  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) //configure and start input capture on channel 1 of TIM2
+  {
+      Error_Handler();
+  }
 
   SigGen_Init();
 

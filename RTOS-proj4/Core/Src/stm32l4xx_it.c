@@ -62,6 +62,7 @@ extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_dac_ch1;
 extern TIM_HandleTypeDef htim15;
 extern UART_HandleTypeDef huart2;
+extern TIM_HandleTypeDef htim2; //we need this to enable our HAL_TIM_IC_CaptureCallback
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -240,6 +241,17 @@ void TIM1_BRK_TIM15_IRQHandler(void)
   /* USER CODE BEGIN TIM1_BRK_TIM15_IRQn 1 */
 
   /* USER CODE END TIM1_BRK_TIM15_IRQn 1 */
+}
+
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+  /* USER CODE END TIM2_IRQn 0 */
+
+  HAL_TIM_IRQHandler(&htim2);
+
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**

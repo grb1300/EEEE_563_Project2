@@ -313,7 +313,7 @@ bool SigGen_ParseCommand(const char *cmd)
 
 	if ( SigGen_Set(waveform, (uint32_t)freq) )
 	{
-	   multiplexSegment(freq);
+	   //multiplexSegment(freq);
 	   return true;
 	}
 	else {

@@ -67,6 +67,14 @@ const osThreadAttr_t CLI_attributes = {
   .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Display */
+osThreadId_t DisplayHandle;
+const osThreadAttr_t Display_attributes = {
+  .name = "Display",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -75,6 +83,7 @@ const osThreadAttr_t CLI_attributes = {
 
 void StartDefaultTask(void *argument);
 void CLI_task(void *argument);
+void Display_task(void *argument); //Add the function prototype for new task
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -110,6 +119,8 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of CLI */
   CLIHandle = osThreadNew(CLI_task, NULL, &CLI_attributes);
+  /* creation of Display */
+  DisplayHandle = osThreadNew(Display_task, NULL, &Display_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -165,7 +176,7 @@ __weak void CLI_task(void *argument)
 	        // ENTER pressed? (CR or LF)
 	        if (rx == '\r' || rx == '\n')
 	        {
-	            uart_print("\r\n");
+	            	uart_print("\r\n");
 
 	            if (idx > 0)
 	            {
@@ -209,6 +220,46 @@ __weak void CLI_task(void *argument)
 	}
   }
   /* USER CODE END CLI_task */
+
+/* USER CODE BEGIN Display_task */
+void Display_task(void *argument)
+{
+	  extern volatile float    Current_Frequency;
+	  extern volatile uint32_t Last_Edge_Time_ms;
+	  uint32_t last_print_disp = 0;   // last value we printed to UART
+	  multiplexSegment(1234); //default state
+	  for (;;){
+		    uint32_t now_ms   = HAL_GetTick();
+		    uint32_t last_ms  = Last_Edge_Time_ms;
+		    uint32_t disp = 1234;
+		    int  signal_present = 0;
+		    if ((now_ms - last_ms) <= 1000u){
+		    	//1 second has passed
+		    	signal_present = 1;
+		    	float f = Current_Frequency;
+		    	if (f){
+		    		disp = (uint32_t)(f + 0.5f);  // round to nearest Hz
+			        if (disp > 9999u) disp = 9999u;
+			        if (disp < 100u)  disp = 100u;
+		    	} else {
+		    		disp = 1234;
+		    	}
+		    } else {
+			    disp = 1234;
+		    }
+			multiplexSegment(disp);
+			if (signal_present){
+				if (disp != last_print_disp){
+			        char buf[64];
+			        int len = snprintf(buf, sizeof(buf),"\r\nMeasured frequency: %lu Hz\r\n", (unsigned long)disp);
+			        HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
+			        last_print_disp = disp;
+				}
+			}
+			vTaskDelay(1);
+	  }
+}
+/* USER CODE END Display_task */
 
 
 /* Private application code --------------------------------------------------*/
