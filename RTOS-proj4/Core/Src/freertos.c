@@ -250,19 +250,19 @@ void Display_task(void *argument)
 			    disp = 1234;
 		    }
 			multiplexSegment(disp);
-			uint32_t ec = g_ic_edge_count;
-	        if (ec != last_edge_count) {
-	            char buf[96];
-	            int len = snprintf(buf, sizeof(buf),
-	                "\r\n[DBG] sig=%d now=%lu last=%lu dt=%lu edges=%lu\r\n",
-	                signal_present,
-	                (unsigned long)now_ms,
-	                (unsigned long)last_ms,
-	                (unsigned long)(now_ms - last_ms),
-	                (unsigned long)ec);
-	            HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
-	            last_edge_count = ec;
-	        }
+//			uint32_t ec = g_ic_edge_count;
+//	        if (ec != last_edge_count) {
+//	            char buf[96];
+//	            int len = snprintf(buf, sizeof(buf),
+//	                "\r\n[DBG] sig=%d now=%lu last=%lu dt=%lu edges=%lu\r\n",
+//	                signal_present,
+//	                (unsigned long)now_ms,
+//	                (unsigned long)last_ms,
+//	                (unsigned long)(now_ms - last_ms),
+//	                (unsigned long)ec);
+//	            HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
+//	            last_edge_count = ec;
+//	        }
 			if (signal_present){
 				if (disp != last_print_disp){
 			        char buf[64];
