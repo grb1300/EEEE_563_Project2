@@ -37,6 +37,8 @@ volatile float Total_Frequency = 0;
 volatile int Current_Sample = 0;
 volatile uint64_t sum_period_ticks = 0;
 volatile uint32_t Last_Edge_Time_ms   = 0;
+volatile uint32_t g_ic_edge_count = 0;
+
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim2;
@@ -113,9 +115,9 @@ void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = SIG_PSC;//Grant Debug 79;
+  htim6.Init.Prescaler = SIG_PSC;//Grant Debug used to be 79;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 7999; //Grant Debug 49;
+  htim6.Init.Period = 7999u; //Grant Debug used to be 49;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -191,7 +193,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	if (htim->Instance != TIM2 || htim->Channel != HAL_TIM_ACTIVE_CHANNEL_1){
 		return;
 	}
-
+	g_ic_edge_count++;
 	Last_Edge_Time_ms = HAL_GetTick();
 
 	if (!First_Rising_Edge){

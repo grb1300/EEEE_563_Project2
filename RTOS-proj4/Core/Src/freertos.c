@@ -226,7 +226,9 @@ void Display_task(void *argument)
 {
 	  extern volatile float    Current_Frequency;
 	  extern volatile uint32_t Last_Edge_Time_ms;
+	  extern volatile uint32_t g_ic_edge_count;
 	  uint32_t last_print_disp = 0;   // last value we printed to UART
+	  uint32_t last_edge_count  = 0;
 	  multiplexSegment(1234); //default state
 	  for (;;){
 		    uint32_t now_ms   = HAL_GetTick();
@@ -248,6 +250,19 @@ void Display_task(void *argument)
 			    disp = 1234;
 		    }
 			multiplexSegment(disp);
+			uint32_t ec = g_ic_edge_count;
+	        if (ec != last_edge_count) {
+	            char buf[96];
+	            int len = snprintf(buf, sizeof(buf),
+	                "\r\n[DBG] sig=%d now=%lu last=%lu dt=%lu edges=%lu\r\n",
+	                signal_present,
+	                (unsigned long)now_ms,
+	                (unsigned long)last_ms,
+	                (unsigned long)(now_ms - last_ms),
+	                (unsigned long)ec);
+	            HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
+	            last_edge_count = ec;
+	        }
 			if (signal_present){
 				if (disp != last_print_disp){
 			        char buf[64];
@@ -256,7 +271,7 @@ void Display_task(void *argument)
 			        last_print_disp = disp;
 				}
 			}
-			vTaskDelay(1);
+			vTaskDelay(50);
 	  }
 }
 /* USER CODE END Display_task */

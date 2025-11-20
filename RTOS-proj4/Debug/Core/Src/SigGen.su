@@ -1,10 +1,10 @@
 ../Core/Src/SigGen.c:57:13:fill_sine	32	static
 ../Core/Src/SigGen.c:79:13:fill_square	24	static
 ../Core/Src/SigGen.c:100:13:apply_waveform	16	static
-../Core/Src/SigGen.c:127:13:Update_TIM6_fs	48	static
-../Core/Src/SigGen.c:180:13:apply_frequency	24	static
-../Core/Src/SigGen.c:203:6:SigGen_Init	16	static
-../Core/Src/SigGen.c:224:6:SigGen_Start	8	static
-../Core/Src/SigGen.c:240:6:SigGen_Stop	8	static
-../Core/Src/SigGen.c:253:6:SigGen_Set	16	static
-../Core/Src/SigGen.c:280:6:SigGen_ParseCommand	48	static
+../Core/Src/SigGen.c:127:13:Update_TIM6_fs	56	static
+../Core/Src/SigGen.c:186:13:apply_frequency	24	static
+../Core/Src/SigGen.c:209:6:SigGen_Init	16	static
+../Core/Src/SigGen.c:230:6:SigGen_Start	8	static
+../Core/Src/SigGen.c:246:6:SigGen_Stop	8	static
+../Core/Src/SigGen.c:259:6:SigGen_Set	16	static
+../Core/Src/SigGen.c:286:6:SigGen_ParseCommand	48	static

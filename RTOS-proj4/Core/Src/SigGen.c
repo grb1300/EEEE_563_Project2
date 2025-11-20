@@ -145,8 +145,14 @@ static void Update_TIM6_fs(uint32_t sample_hz)
 	// Prevent underflow if calculation would go negative
 
 	uint32_t timer_clk = HAL_RCC_GetPCLK1Freq();
-	uint32_t prescaler = TIM6->PSC;
-	uint32_t ARR = round((double)timer_clk/((double)(prescaler + 1.0)*(double)sample_hz)) - 1.0; //Grant Debug
+	uint32_t prescaler = SIG_PSC;// TIM6->PSC; Prior prescalar limited clock to 1Mhz
+	//uint32_t ARR = round((double)timer_clk/((double)(prescaler + 1.0)*(double)sample_hz)) - 1.0; //Grant Debug
+	//do we need -1?
+	double ARR_double = (double)timer_clk/((double)(prescaler + 1.0)*(double)sample_hz);
+    if (ARR_double < 1.0) { //check for underflow
+    	ARR_double = 1.0;
+    }
+    uint32_t ARR = (uint32_t)(ARR_double + 0.5) - 1u;
 	uint32_t counter = 0;
 
 
@@ -165,10 +171,10 @@ static void Update_TIM6_fs(uint32_t sample_hz)
 
 	__HAL_TIM_DISABLE(&htim6);
 	__HAL_TIM_SET_PRESCALER(&htim6, prescaler);
-	__HAL_TIM_SET_COUNTER(&htim6, counter);
 	__HAL_TIM_SET_AUTORELOAD(&htim6, ARR);
-	 __HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
-	 __HAL_TIM_ENABLE(&htim6);
+	__HAL_TIM_SET_COUNTER(&htim6, counter);
+	__HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
+	__HAL_TIM_ENABLE(&htim6);
 
 
 }
