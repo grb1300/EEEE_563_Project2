@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include "SigGen.h"
 #include "7seg.h"
+ #include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -75,6 +76,19 @@ const osThreadAttr_t Display_attributes = {
   .priority = (osPriority_t) osPriorityLow,
 };
 
+/* Definitions for Display */
+osThreadId_t SigGen;
+const osThreadAttr_t SigGen_attributes = {
+  .name = "SigGen",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+
+
+osMessageQueueId_t taskQueueHandle;
+const osMessageQueueAttr_t Queue_attributes = {
+		.name = "taskQueue"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -84,6 +98,7 @@ const osThreadAttr_t Display_attributes = {
 void StartDefaultTask(void *argument);
 void CLI_task(void *argument);
 void Display_task(void *argument); //Add the function prototype for new task
+void SigGen_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -121,6 +136,10 @@ void MX_FREERTOS_Init(void) {
   CLIHandle = osThreadNew(CLI_task, NULL, &CLI_attributes);
   /* creation of Display */
   DisplayHandle = osThreadNew(Display_task, NULL, &Display_attributes);
+
+  SigGen = osThreadNew(SigGen_task, NULL, &SigGen_attributes);
+
+  taskQueueHandle = osMessageQueueNew (16, sizeof(GenWave), &Queue_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -163,6 +182,12 @@ __weak void CLI_task(void *argument)
   /* Infinite loop */
 	for (;;)
 	{
+
+		const char *wave_names[] = {
+		    "sine",
+		    "square"
+		};
+
 	    char rx;
 	    static char cmd[32];        // command line buffer
 	    static uint8_t idx = 0;     // current write index
@@ -186,10 +211,30 @@ __weak void CLI_task(void *argument)
 //	                		//now we want a string that is cmd but with the backspace character and character before backspace removed (only if applicable)
 //	                	}
 //	                }
-	                uint8_t parsed_command_value = SigGen_ParseCommand(cmd);
-	                if (parsed_command_value)
+	                 GenWave parsed_command_value;
+	                parsed_command_value =  SigGen_ParseCommand(cmd);
+
+	                if (parsed_command_value.correctForm)
 	                {
-	                    uart_print("OK\r\n");
+	                    // Debug print: show what was parsed
+	                    char buffer[64];
+	                    // Assuming sig_wave_t is an enum/int you can print with %d
+	                    snprintf(buffer, sizeof(buffer),
+	                             "Added to Queue: wave=%d freq=%lu\r\n",
+	                             wave_names[(int)parsed_command_value.waveform],
+	                             (unsigned long)parsed_command_value.freq);
+	                    uart_print(buffer);
+
+	                    // ✅ IMPORTANT: pass a POINTER to the struct
+	                    osStatus_t status = osMessageQueuePut(taskQueueHandle,
+	                                                          &parsed_command_value,  // &struct, not struct
+	                                                          0,                      // priority (often 0)
+	                                                          0);                     // timeout (0 = no wait)
+
+	                    if (status != osOK)
+	                    {
+	                        uart_print("ERR: queue full or send failed\r\n");
+	                    }
 	                }
 	                else
 	                {
@@ -221,14 +266,57 @@ __weak void CLI_task(void *argument)
   }
   /* USER CODE END CLI_task */
 
+
+
+__weak void SigGen_task(void *argument)
+{
+
+    GenWave cmd;
+
+
+	for (;;)
+		{
+		  // 1) Wait forever until a command arrives
+		        osStatus_t status = osMessageQueueGet(taskQueueHandle,
+		                                              &cmd,
+		                                              NULL,          // priority
+		                                              osWaitForever  // block until message arrives
+		                                              );
+		        if (status == osOK)
+		        {
+		            char buffer[64];
+		            snprintf(buffer, sizeof(buffer),
+		                     "Executing: wave=%d freq=%lu\r\n",
+		                     (int)cmd.waveform,
+		                     (unsigned long)cmd.freq);
+		            uart_print(buffer);
+
+
+		            SigGen_Set(cmd.waveform, cmd.freq);
+
+		            // 4) Sleep 1 second
+		            osDelay(5000);
+		        }
+		        else
+		        {
+		            uart_print("ERR: queue read failed\r\n");
+		        }
+
+		}
+
+
+}
+
+
+
+
+
 /* USER CODE BEGIN Display_task */
 void Display_task(void *argument)
 {
 	  extern volatile float    Current_Frequency;
 	  extern volatile uint32_t Last_Edge_Time_ms;
-	  extern volatile uint32_t g_ic_edge_count;
 	  uint32_t last_print_disp = 0;   // last value we printed to UART
-	  uint32_t last_edge_count  = 0;
 	  multiplexSegment(1234); //default state
 	  for (;;){
 		    uint32_t now_ms   = HAL_GetTick();
@@ -267,7 +355,7 @@ void Display_task(void *argument)
 				if (disp != last_print_disp){
 			        char buf[64];
 			        int len = snprintf(buf, sizeof(buf),"\r\nMeasured frequency: %lu Hz\r\n", (unsigned long)disp);
-			        HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
+			     //   HAL_UART_Transmit(&huart2, (uint8_t *)buf, len, HAL_MAX_DELAY);
 			        last_print_disp = disp;
 				}
 			}

@@ -49,6 +49,8 @@ static bool s_started = false;							// Is TIM6 running?
 // --------------------------- Helper functions ------------------------------
 
 
+
+
 // ------------------------------ fill_sine() -----------------------------------
 // Fill the buffer with one PERIOD of a 12-bit sine wave (0..4095).
 // dst = destination array — where the function will store the generated sine wave samples
@@ -283,11 +285,14 @@ bool SigGen_Set(sig_wave_t wave, uint32_t fout_hz)
 // Command format: <Waveform Type><Space><Freq in Hz>
 // If command is valid then set Signal Generation and Update Multisegment Display
 // -----------------------------------------------------------------------------------
-bool SigGen_ParseCommand(const char *cmd)
+GenWave SigGen_ParseCommand(const char *cmd)
 {
+	 GenWave CurrentWave;
+
     if (!cmd){
     	//uart_print("Executing on line: 283\n");
-    	return false;
+    	CurrentWave.correctForm = false;
+        return CurrentWave;
     }
 
 	char wf[16] = {0};
@@ -296,11 +301,13 @@ bool SigGen_ParseCommand(const char *cmd)
 	// parse: <word> <number>  (ignores extra spaces at start)
 	if (sscanf(cmd, " %15s %u", wf, &freq) != 2){
 		//uart_print("Executing on line: 292\n");
-		return false;
+		CurrentWave.correctForm = false;
+		return CurrentWave;
 	}
 	if (freq < SIG_FREQ_MIN_HZ || freq > SIG_FREQ_MAX_HZ){
 		//uart_print("Executing on line: 296\n");
-		return false;
+		CurrentWave.correctForm = false;
+		return CurrentWave;
 	}
 
 	// case-insensitive check of waveform token
@@ -314,16 +321,14 @@ bool SigGen_ParseCommand(const char *cmd)
 	else if (wf[0] == '1')            waveform = SIG_WAVE_SQUARE;
 	else{
 		//uart_print("Executing on line: 310 \n");
-		return false;
+		CurrentWave.correctForm = false;
+		return CurrentWave;
 	}
 
-	if ( SigGen_Set(waveform, (uint32_t)freq) )
-	{
-	   //multiplexSegment(freq);
-	   return true;
-	}
-	else {
-		//uart_print("Executing on line: 320\n");
-	   return false;
-	}
+
+
+	CurrentWave.correctForm = true;
+	CurrentWave.freq = freq;
+	CurrentWave.waveform = waveform;
+    return CurrentWave;
 }

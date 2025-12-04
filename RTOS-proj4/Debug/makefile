@@ -64,8 +64,8 @@ all: main-build
 main-build: RTOS-proj4.elf secondary-outputs
 
 # Tool invocations
-RTOS-proj4.elf RTOS-proj4.map: $(OBJS) $(USER_OBJS) C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\RTOS-proj4\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "RTOS-proj4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Grant\STM32CubeIDE\workspace_1.19.0\RTOS-proj4\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="RTOS-proj4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+RTOS-proj4.elf RTOS-proj4.map: $(OBJS) $(USER_OBJS) C:\Users\cokac\STM32CubeIDE\workspace_1.19.0\project4\EEEE_563_Project2\RTOS-proj4\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "RTOS-proj4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\cokac\STM32CubeIDE\workspace_1.19.0\project4\EEEE_563_Project2\RTOS-proj4\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="RTOS-proj4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

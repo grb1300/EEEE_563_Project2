@@ -1,4 +1,5 @@
-../Core/Src/freertos.c:95:6:MX_FREERTOS_Init	8	static
-../Core/Src/freertos.c:142:6:StartDefaultTask	16	static
-../Core/Src/freertos.c:160:13:CLI_task	24	static
-../Core/Src/freertos.c:225:6:Display_task	112	static
+../Core/Src/freertos.c:110:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:161:6:StartDefaultTask	16	static
+../Core/Src/freertos.c:179:13:CLI_task	136	static
+../Core/Src/freertos.c:271:13:SigGen_task	104	static
+../Core/Src/freertos.c:315:6:Display_task	112	static

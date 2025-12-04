@@ -118,6 +118,8 @@ int main(void)
 
   SigGen_Init();
 
+
+  uart_print("Add signals using this format sine|square <100-9999>: \"\r\n");
   /* USER CODE END 2 */
 
   /* Init scheduler */
